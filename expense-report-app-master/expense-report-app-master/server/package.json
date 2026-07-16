@@ -1,0 +1,16 @@
+{
+  "name": "expense-report-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.0",
+    "express": "^4.19.0",
+    "helmet": "^3.0.0",
+    "sequelize": "^5.0.0",
+    "sqlite3": "^5.0.0"
+  }
+}

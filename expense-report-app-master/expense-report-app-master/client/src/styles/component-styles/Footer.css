@@ -1,0 +1,32 @@
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: block;
+  padding: 0.35rem 0;
+}
+
+.page-footer {
+  margin-top: auto;
+  background: linear-gradient(135deg, #103a64 0%, #295c9e 100%);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -10px 30px rgba(16, 58, 100, 0.2);
+}
+
+.page-footer .container {
+  padding: 1.2rem 0 0.8rem;
+}
+
+.page-footer a {
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 0.2s ease;
+}
+
+.page-footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}

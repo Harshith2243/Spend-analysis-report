@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Report - Spring Boot</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+      color: #222;
+    }
+    header {
+      background: #1b5e20;
+      color: #fff;
+      padding: 20px 24px;
+    }
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    h1, h2 { margin-top: 0; }
+    .links a {
+      display: inline-block;
+      margin: 6px 10px 6px 0;
+      color: #1b5e20;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th { background: #e8f5e9; }
+    tr:nth-child(even) { background: #fafafa; }
+    .empty, .loading, .error {
+      padding: 16px;
+      border-radius: 6px;
+    }
+    .loading { background: #fff8e1; }
+    .error { background: #ffebee; color: #b71c1c; }
+    .empty { background: #eceff1; }
+    button {
+      background: #c62828;
+      color: #fff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:disabled { background: #9e9e9e; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Expense Report Backend</h1>
+    <p>Spring Boot dashboard on port 3001</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>API Links</h2>
+      <div class="links">
+        <a href="/api/getAll" target="_blank">Raw JSON: All Expenses</a>
+        <a href="/api/getMerchants" target="_blank">Raw JSON: Merchants</a>
+        <a href="/api/getCategories" target="_blank">Raw JSON: Products/Categories</a>
+        <a href="/api/getTPC" target="_blank">Raw JSON: Chart Data</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Your Data</h2>
+      <div id="status" class="loading">Loading data...</div>
+      <div id="table-wrap"></div>
+    </section>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const tableWrap = document.getElementById('table-wrap');
+
+    function formatAmount(value) {
+      return Number(value).toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
+    }
+
+    async function loadData() {
+      try {
+        const response = await fetch('/api/getAll');
+        if (!response.ok) throw new Error('Could not load data from /api/getAll');
+
+        const rows = await response.json();
+        statusEl.style.display = 'none';
+
+        if (!rows.length) {
+          tableWrap.innerHTML = '<div class="empty">No records yet. Add data from the React app at <a href="http://localhost:3000">http://localhost:3000</a>.</div>';
+          return;
+        }
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Store</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Transaction Type</th>
+              <th>Product</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+
+        const tbody = table.querySelector('tbody');
+
+        rows.forEach((item, index) => {
+          const tx = item.productTransaction || {};
+          const merchant = tx.transactionMerchant || {};
+          const category = tx.transactionCategory || {};
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${merchant.store_name || '-'}</td>
+            <td>${tx.amount != null ? formatAmount(tx.amount) : '-'}</td>
+            <td>${tx.date || '-'}</td>
+            <td>${item.name || '-'}</td>
+            <td>${category.name || '-'}</td>
+            <td><button data-id="${item.id}">Delete</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tableWrap.appendChild(table);
+
+        tableWrap.addEventListener('click', async (event) => {
+          if (event.target.tagName !== 'BUTTON') return;
+          const id = event.target.dataset.id;
+          if (!window.confirm('Delete this record?')) return;
+
+          event.target.disabled = true;
+          const deleteResponse = await fetch('/api/deleteExpense/' + id, { method: 'DELETE' });
+          if (!deleteResponse.ok) {
+            alert('Delete failed');
+            event.target.disabled = false;
+            return;
+          }
+          loadData();
+        });
+      } catch (error) {
+        statusEl.className = 'error';
+        statusEl.textContent = error.message + ' — Make sure Spring Boot is running on port 3001.';
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

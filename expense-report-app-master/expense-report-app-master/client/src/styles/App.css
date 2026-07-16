@@ -1,0 +1,31 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at top left, rgba(95, 168, 255, 0.2), transparent 28%),
+    linear-gradient(135deg, #f7fbff 0%, #eef5ff 45%, #ffffff 100%);
+  color: #15324a;
+}
+
+.page-content {
+  padding: 2rem 1.4rem 3rem;
+}
+
+.app-card {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 18px 45px rgba(16, 47, 77, 0.12);
+  border-radius: 24px;
+}
+
+.eyebrow {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #5b7cff;
+  margin-bottom: 0.45rem;
+}
